@@ -1,4 +1,4 @@
-## Project Scenario
+## Scenario
 
 A company is deploying a web application into AWS and needs a secure network foundation that separates internet-facing resources from application workloads and sensitive data stores.
 
