@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User as Internet User
+    participant IGW as Internet Gateway
+    participant ALB as Public ALB
+    participant APP as Private App Server
+    participant DB as Isolated Database
+    participant NAT as NAT Gateway
+    participant AWS as AWS Services
+
+    User->>IGW: HTTPS request
+    IGW->>ALB: Forward to ALB
+    ALB->>APP: App traffic on approved port
+    APP->>DB: Database traffic on approved port
+    APP->>NAT: Outbound updates/API calls
+    NAT->>AWS: Internet or AWS public endpoint path
+    APP->>AWS: Private access through VPC Endpoint where configured
+    DB--xInternet User: No direct internet route

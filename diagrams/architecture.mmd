@@ -1,1 +1,14 @@
-
+flowchart TB
+    Internet((Internet)) --> IGW[Internet Gateway]
+    IGW --> Public[Public Subnets]
+    Public --> ALB[Application Load Balancer SG: HTTPS 443]
+    Public --> NAT[NAT Gateway]
+    ALB --> App[Private App Subnets SG: App Port 8080]
+    App --> DB[Isolated Data Subnets SG: DB Port 5432]
+    App --> NAT
+    NAT --> IGW
+    DB -. No default internet route .- X[Blocked Internet Egress]
+    App --> VPCE[VPC Endpoints]
+    DB --> VPCE
+    VPCFlow[VPC Flow Logs] --> CW[CloudWatch Logs]
+    VPCFlow --> S3[S3 Archive]
