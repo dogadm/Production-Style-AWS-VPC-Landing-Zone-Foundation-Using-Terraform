@@ -1,0 +1,28 @@
+aws_region  = "eu-west-2"
+project_name = "secure-vpc"
+environment  = "dev"
+
+vpc_cidr = "10.0.0.0/16"
+az_count = 2
+
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+data_subnet_cidrs    = ["10.0.100.0/24", "10.0.200.0/24"]
+
+# In a real environment, restrict this to trusted corporate IP ranges or CloudFront/WAF paths.
+allowed_alb_ingress_cidrs = ["0.0.0.0/0"]
+
+app_port = 8080
+db_port  = 5432
+
+# Use false for cost saving in demos; true shows private subnet outbound design.
+enable_nat_gateway = true
+
+# Set true to reduce cost. Set false for one NAT Gateway per AZ and better HA.
+single_nat_gateway = false
+
+enable_flow_logs        = true
+flow_log_retention_days = 30
+
+interface_endpoint_services = ["ssm", "ssmmessages", "ec2messages", "logs", "sts"]
+enable_s3_gateway_endpoint  = true
