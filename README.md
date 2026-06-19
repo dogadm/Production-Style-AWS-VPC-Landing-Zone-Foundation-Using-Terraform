@@ -23,7 +23,7 @@ The goal is not just to create a VPC. The goal is to show how a Cloud Security E
 
 ---
 
-## Project Scenario
+## Scenario
 
 A company is deploying a web application into AWS and requires a secure network foundation.
 
