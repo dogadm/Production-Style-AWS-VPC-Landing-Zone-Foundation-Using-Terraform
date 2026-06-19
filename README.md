@@ -429,7 +429,7 @@ These checks help catch formatting issues, Terraform errors, linting problems, a
 
 ## CI/CD Security Checks
 
-This project can be integrated with GitHub Actions to run validation on pull requests.
+It can also be integrated with GitHub Actions to run validation on pull requests.
 
 Example checks:
 
