@@ -558,34 +558,6 @@ In a real production environment, this design could be extended with:
 
 ---
 
-## Interview Talking Points
-
-### Short Explanation
-
-I built a secure AWS VPC architecture using Terraform. The design separates public, private, and isolated data tiers across multiple Availability Zones. Public subnets host internet-facing entry points such as an ALB and NAT Gateway, private subnets host application workloads, and data subnets have no default route to the internet. I used Security Group references for least-privilege access, VPC Endpoints for private AWS service access, and VPC Flow Logs for visibility and auditability.
-
-### STAR Explanation
-
-**Situation:**  
-I wanted to build a practical AWS cloud security project that reflects how secure network foundations are designed in real environments.
-
-**Task:**  
-The objective was to design a production-style VPC using Terraform, with clear separation between public, private, and data tiers, while applying least-privilege network access and visibility controls.
-
-**Action:**  
-I created a multi-AZ VPC with public subnets for internet-facing components, private subnets for application workloads, and isolated data subnets with no direct internet route. I configured route tables, NAT Gateway routing, Security Groups using least-privilege references, NACLs for subnet-level control, VPC Endpoints for private AWS service access, and VPC Flow Logs for network visibility. I also documented the security decisions and added Terraform validation and IaC security scanning.
-
-**Result:**  
-The final design reduced the public attack surface, isolated sensitive workloads, provided controlled outbound access, improved auditability through flow logs, and demonstrated how infrastructure can be deployed securely and repeatedly using Terraform.
-
----
-
-## Recruiter Summary
-
-Designed and deployed a secure multi-tier AWS VPC using Terraform, including public, private, and isolated data subnets across multiple Availability Zones, least-privilege Security Groups, subnet-level NACL controls, NAT Gateway routing, VPC Endpoints, and VPC Flow Logs for network visibility and security auditing.
-
----
-
 ## Skills Demonstrated
 
 - AWS VPC design
