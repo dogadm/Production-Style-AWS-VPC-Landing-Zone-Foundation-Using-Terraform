@@ -42,7 +42,7 @@ This project implements that requirement using a multi-tier AWS VPC architecture
 
 ## What This Project Demonstrates
 
-This project demonstrates practical skills across AWS networking, cloud security, Terraform, and DevSecOps-style validation.
+It demonstrates practical skills across AWS networking, cloud security, Terraform, and DevSecOps-style validation.
 
 | Area | Demonstrated Capability |
 |---|---|
