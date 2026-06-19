@@ -20,7 +20,6 @@ The goal is not just to create a VPC. The goal is to show how a Cloud Security E
 - Network visibility using VPC Flow Logs
 - Infrastructure as Code validation and security scanning
 
-This project is designed to be recruiter-visible and interview-ready. It shows not only what was built, but also **why each security decision was made**.
 
 ---
 
