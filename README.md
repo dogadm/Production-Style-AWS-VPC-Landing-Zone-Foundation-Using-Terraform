@@ -5,7 +5,7 @@
 ![Security](https://img.shields.io/badge/Focus-Cloud%20Security-blue)
 ![Status](https://img.shields.io/badge/Project-Portfolio%20Ready-success)
 
-## Project Summary
+## Summary
 
 This project demonstrates how to design and deploy a **secure, production-style AWS VPC** using **Terraform**.
 
