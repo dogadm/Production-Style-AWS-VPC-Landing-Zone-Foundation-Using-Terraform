@@ -14,13 +14,20 @@ resource "aws_vpc_endpoint" "interface" {
   }
 }
 
+
+
 resource "aws_vpc_endpoint" "s3" {
   count = var.enable_s3_gateway_endpoint ? 1 : 0
 
   vpc_id            = aws_vpc.main.id
   service_name      = "com.amazonaws.${var.aws_region}.s3"
   vpc_endpoint_type = "Gateway"
-  route_table_ids   = concat(aws_route_table.private[*].id, aws_route_table.data[*].id)
+
+  # Gateway endpoints are associated only with private application
+  # route tables. Isolated data subnets do not require direct S3
+  # access and therefore remain without this service route.
+
+  route_table_ids = aws_route_table.private[*].id
 
   tags = {
     Name = "${local.name_prefix}-s3-gateway-vpce"
@@ -34,7 +41,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
   vpc_id            = aws_vpc.main.id
   service_name      = "com.amazonaws.${var.aws_region}.dynamodb"
   vpc_endpoint_type = "Gateway"
-  route_table_ids   = concat(aws_route_table.private[*].id, aws_route_table.data[*].id)
+  route_table_ids   = aws_route_table.private[*].id
 
   tags = {
     Name = "${local.name_prefix}-dynamodb-gateway-vpce"
