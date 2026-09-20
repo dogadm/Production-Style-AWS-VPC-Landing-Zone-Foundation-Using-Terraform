@@ -90,7 +90,7 @@ variable "enable_flow_logs" {
 variable "flow_log_retention_days" {
   description = "CloudWatch log retention period for VPC Flow Logs."
   type        = number
-  default     = 30
+  default     = 365
 }
 
 variable "interface_endpoint_services" {
@@ -109,4 +109,14 @@ variable "enable_dynamodb_gateway_endpoint" {
   description = "Whether to create a DynamoDB Gateway VPC Endpoint."
   type        = bool
   default     = false
+}
+
+variable "availability_zone_ids" {
+  description = "Stable Availability Zone IDs used by the VPC"
+  type        = list(string)
+
+  validation {
+    condition     = length(var.availability_zone_ids) >= var.az_count
+    error_message = "availability_zone_ids must contain at least az_count Availability Zone IDs."
+  }
 }

@@ -1,4 +1,6 @@
 resource "aws_security_group" "alb" {
+  # checkov:skip=CKV2_AWS_5: Security group is part of the reusable network security foundation; the consuming ALB resource is intentionally outside this Terraform scope.
+
   name        = "${local.name_prefix}-alb-sg"
   description = "Allow HTTPS from approved CIDRs and forward only to application tier."
   vpc_id      = aws_vpc.main.id
@@ -33,6 +35,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_app" {
 }
 
 resource "aws_security_group" "app" {
+  # checkov:skip=CKV2_AWS_5: Security group is part of the reusable network security foundation; the consuming application workload is intentionally outside this Terraform scope.
   name        = "${local.name_prefix}-app-sg"
   description = "Application tier accepts traffic only from ALB security group."
   vpc_id      = aws_vpc.main.id
@@ -74,6 +77,8 @@ resource "aws_vpc_security_group_egress_rule" "app_https_outbound" {
 }
 
 resource "aws_security_group" "db" {
+  # checkov:skip=CKV2_AWS_5: Security group is part of the reusable network security foundation; the consuming database resource is intentionally outside this Terraform scope.
+
   name        = "${local.name_prefix}-db-sg"
   description = "Database tier accepts traffic only from application security group."
   vpc_id      = aws_vpc.main.id
@@ -124,4 +129,12 @@ resource "aws_vpc_security_group_egress_rule" "vpce_egress_to_vpc" {
   description       = "Allow endpoint return traffic inside the VPC."
   cidr_ipv4         = var.vpc_cidr
   ip_protocol       = "-1"
+}
+
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${local.name_prefix}-default-sg-restricted"
+  }
 }
