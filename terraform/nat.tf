@@ -1,6 +1,8 @@
 resource "aws_eip" "nat" {
   count = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : var.az_count) : 0
 
+  # checkov:skip=CKV2_AWS_19: Each EIP is consumed by aws_nat_gateway.nat through allocation_id; it is not an unattached EIP.
+
   domain = "vpc"
 
   tags = {
