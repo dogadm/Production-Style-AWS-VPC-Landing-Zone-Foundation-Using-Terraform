@@ -29,11 +29,17 @@ terraform {
 
   required_providers {
     aws = {
-      source = "hashicorp/aws"
-      # keep your existing version constraint
+      source  = "hashicorp/aws"
+      version = "~> 6.14"
+    }
+
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.9"
     }
   }
 }
+
 
 provider "aws" {
   region = var.aws_region
