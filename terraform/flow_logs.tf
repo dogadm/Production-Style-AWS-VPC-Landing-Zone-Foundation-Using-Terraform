@@ -129,6 +129,11 @@ resource "random_id" "flow_logs_bucket_suffix" {
   byte_length = 4
 }
 
+
+# S3 server access logging would require a dedicated secondary logging
+# destination and is intentionally deferred for this portfolio environment.
+#tfsec:ignore:aws-s3-enable-bucket-logging
+#trivy:ignore:AVD-AWS-0089
 resource "aws_s3_bucket" "flow_logs" {
   count = var.enable_flow_logs ? 1 : 0
 

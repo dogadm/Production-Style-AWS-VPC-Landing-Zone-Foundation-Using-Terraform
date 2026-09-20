@@ -13,6 +13,10 @@ resource "aws_network_acl" "public" {
   }
 }
 
+
+# Public subnet intentionally permits HTTPS ingress from the internet.
+# Security groups provide the stateful workload-level control.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
 resource "aws_network_acl_rule" "public_in_https" {
   network_acl_id = aws_network_acl.public.id
   rule_number    = 100
@@ -24,6 +28,10 @@ resource "aws_network_acl_rule" "public_in_https" {
   to_port        = 443
 }
 
+
+# Required return-path ephemeral traffic for internet/NAT communication.
+# Port 3389 is deliberately excluded as defense in depth.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
 resource "aws_network_acl_rule" "public_in_ephemeral_low" {
   network_acl_id = aws_network_acl.public.id
   rule_number    = 110
@@ -35,6 +43,10 @@ resource "aws_network_acl_rule" "public_in_ephemeral_low" {
   to_port        = 3388
 }
 
+
+# Required return-path ephemeral traffic for internet/NAT communication.
+# Port 3389 is deliberately excluded as defense in depth.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
 resource "aws_network_acl_rule" "public_in_ephemeral_high" {
   network_acl_id = aws_network_acl.public.id
   rule_number    = 111
@@ -46,6 +58,11 @@ resource "aws_network_acl_rule" "public_in_ephemeral_high" {
   to_port        = 65535
 }
 
+
+# Public-subnet egress is intentionally broad to support NAT Gateway
+# and public-tier return traffic. Workload-level egress is restricted
+# with stateful security groups and private-subnet controls.
+#tfsec:ignore:aws-ec2-no-excessive-port-access
 resource "aws_network_acl_rule" "public_out_all" {
   network_acl_id = aws_network_acl.public.id
   rule_number    = 100
@@ -90,6 +107,10 @@ resource "aws_network_acl_rule" "private_in_ephemeral_from_vpc" {
   to_port        = 65535
 }
 
+
+# Stateless NACL return path for internet connections initiated by private workloads via NAT.
+# Port 3389 is deliberately excluded.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
 resource "aws_network_acl_rule" "private_in_ephemeral_from_internet_return_low" {
   network_acl_id = aws_network_acl.private.id
   rule_number    = 120
@@ -101,6 +122,10 @@ resource "aws_network_acl_rule" "private_in_ephemeral_from_internet_return_low" 
   to_port        = 3388
 }
 
+
+# Stateless NACL return path for internet connections initiated by private workloads via NAT.
+# Port 3389 is deliberately excluded.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
 resource "aws_network_acl_rule" "private_in_ephemeral_from_internet_return_high" {
   network_acl_id = aws_network_acl.private.id
   rule_number    = 121
