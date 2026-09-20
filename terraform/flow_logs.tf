@@ -138,6 +138,7 @@ resource "aws_s3_bucket" "flow_logs" {
   count = var.enable_flow_logs ? 1 : 0
 
   # Controls implemented through separate AWS provider resources
+  # checkov:skip=CKV_AWS_19: Bucket encryption is configured separately through aws_s3_bucket_server_side_encryption_configuration.flow_logs using SSE-KMS.
   # checkov:skip=CKV_AWS_21: Bucket versioning is enabled separately through aws_s3_bucket_versioning.flow_logs, following the current AWS provider resource model.
   # checkov:skip=CKV_AWS_145: Default SSE-KMS encryption is configured separately through aws_s3_bucket_server_side_encryption_configuration.flow_logs using the customer-managed Flow Logs KMS key.
   # checkov:skip=CKV2_AWS_61: Lifecycle configuration is defined separately in aws_s3_bucket_lifecycle_configuration.flow_logs.
