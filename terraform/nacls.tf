@@ -3,6 +3,7 @@
 # the primary control and NACLs are used for coarse subnet guardrails or emergency blocks.
 
 resource "aws_network_acl" "public" {
+  # checkov:skip=CKV2_AWS_1: NACL is explicitly associated with public subnets through subnet_ids = aws_subnet.public[*].id; graph analysis does not resolve this association.
   vpc_id     = aws_vpc.main.id
   subnet_ids = aws_subnet.public[*].id
 
@@ -12,6 +13,10 @@ resource "aws_network_acl" "public" {
   }
 }
 
+
+# Public subnet intentionally permits HTTPS ingress from the internet.
+# Security groups provide the stateful workload-level control.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
 resource "aws_network_acl_rule" "public_in_https" {
   network_acl_id = aws_network_acl.public.id
   rule_number    = 100
@@ -23,7 +28,11 @@ resource "aws_network_acl_rule" "public_in_https" {
   to_port        = 443
 }
 
-resource "aws_network_acl_rule" "public_in_ephemeral" {
+
+# Required return-path ephemeral traffic for internet/NAT communication.
+# Port 3389 is deliberately excluded as defense in depth.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
+resource "aws_network_acl_rule" "public_in_ephemeral_low" {
   network_acl_id = aws_network_acl.public.id
   rule_number    = 110
   egress         = false
@@ -31,9 +40,29 @@ resource "aws_network_acl_rule" "public_in_ephemeral" {
   rule_action    = "allow"
   cidr_block     = "0.0.0.0/0"
   from_port      = 1024
+  to_port        = 3388
+}
+
+
+# Required return-path ephemeral traffic for internet/NAT communication.
+# Port 3389 is deliberately excluded as defense in depth.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
+resource "aws_network_acl_rule" "public_in_ephemeral_high" {
+  network_acl_id = aws_network_acl.public.id
+  rule_number    = 111
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 3390
   to_port        = 65535
 }
 
+
+# Public-subnet egress is intentionally broad to support NAT Gateway
+# and public-tier return traffic. Workload-level egress is restricted
+# with stateful security groups and private-subnet controls.
+#tfsec:ignore:aws-ec2-no-excessive-port-access
 resource "aws_network_acl_rule" "public_out_all" {
   network_acl_id = aws_network_acl.public.id
   rule_number    = 100
@@ -46,6 +75,7 @@ resource "aws_network_acl_rule" "public_out_all" {
 }
 
 resource "aws_network_acl" "private" {
+  # checkov:skip=CKV2_AWS_1: NACL is explicitly associated with private subnets through subnet_ids = aws_subnet.private[*].id; graph analysis does not resolve this association.
   vpc_id     = aws_vpc.main.id
   subnet_ids = aws_subnet.private[*].id
 
@@ -77,7 +107,11 @@ resource "aws_network_acl_rule" "private_in_ephemeral_from_vpc" {
   to_port        = 65535
 }
 
-resource "aws_network_acl_rule" "private_in_ephemeral_from_internet_return" {
+
+# Stateless NACL return path for internet connections initiated by private workloads via NAT.
+# Port 3389 is deliberately excluded.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
+resource "aws_network_acl_rule" "private_in_ephemeral_from_internet_return_low" {
   network_acl_id = aws_network_acl.private.id
   rule_number    = 120
   egress         = false
@@ -85,6 +119,21 @@ resource "aws_network_acl_rule" "private_in_ephemeral_from_internet_return" {
   rule_action    = "allow"
   cidr_block     = "0.0.0.0/0"
   from_port      = 1024
+  to_port        = 3388
+}
+
+
+# Stateless NACL return path for internet connections initiated by private workloads via NAT.
+# Port 3389 is deliberately excluded.
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
+resource "aws_network_acl_rule" "private_in_ephemeral_from_internet_return_high" {
+  network_acl_id = aws_network_acl.private.id
+  rule_number    = 121
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 3390
   to_port        = 65535
 }
 
@@ -122,6 +171,8 @@ resource "aws_network_acl_rule" "private_out_ephemeral_to_vpc" {
 }
 
 resource "aws_network_acl" "data" {
+  # checkov:skip=CKV2_AWS_1: NACL is explicitly associated with data subnets through subnet_ids = aws_subnet.data[*].id; graph analysis does not resolve this association.
+
   vpc_id     = aws_vpc.main.id
   subnet_ids = aws_subnet.data[*].id
 

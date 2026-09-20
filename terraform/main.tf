@@ -1,28 +1,45 @@
+# terraform {
+#   required_version = ">= 1.5.0"
+
+#   required_providers {
+#     aws = {
+#       source  = "hashicorp/aws"
+#       version = ">= 5.0, < 7.0"
+#     }
+
+#     random = {
+#       source  = "hashicorp/random"
+#       version = ">= 3.5"
+#     }
+#   }
+
+#   # Production recommendation:
+#   # Configure a remote backend using S3 and DynamoDB state locking.
+#   # backend "s3" {
+#   #   bucket         = "replace-with-terraform-state-bucket"
+#   #   key            = "secure-vpc/terraform.tfstate"
+#   #   region         = "eu-west-2"
+#   #   dynamodb_table = "replace-with-lock-table"
+#   #   encrypt        = true
+#   # }
+# }
+
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.9.0, < 2.0.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.0, < 7.0"
+      version = "~> 6.14"
     }
 
     random = {
       source  = "hashicorp/random"
-      version = ">= 3.5"
+      version = "~> 3.9"
     }
   }
-
-  # Production recommendation:
-  # Configure a remote backend using S3 and DynamoDB state locking.
-  # backend "s3" {
-  #   bucket         = "replace-with-terraform-state-bucket"
-  #   key            = "secure-vpc/terraform.tfstate"
-  #   region         = "eu-west-2"
-  #   dynamodb_table = "replace-with-lock-table"
-  #   encrypt        = true
-  # }
 }
+
 
 provider "aws" {
   region = var.aws_region
@@ -32,8 +49,17 @@ provider "aws" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
+data "aws_partition" "current" {}
+
 data "aws_availability_zones" "available" {
   state = "available"
+
+  filter {
+    name   = "zone-id"
+    values = var.availability_zone_ids
+  }
 }
 
 locals {

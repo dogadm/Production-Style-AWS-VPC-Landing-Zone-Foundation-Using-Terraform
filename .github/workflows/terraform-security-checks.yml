@@ -28,7 +28,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.5
+          terraform_version: 1.14.4
 
       - name: Terraform format check
         run: terraform fmt -check -recursive
@@ -51,10 +51,10 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: terraform
-          soft_fail: true
+          soft_fail: false
 
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@master
         with:
           directory: terraform
-          soft_fail: true
+          soft_fail: false
