@@ -1,27 +1,38 @@
+# terraform {
+#   required_version = ">= 1.5.0"
+
+#   required_providers {
+#     aws = {
+#       source  = "hashicorp/aws"
+#       version = ">= 5.0, < 7.0"
+#     }
+
+#     random = {
+#       source  = "hashicorp/random"
+#       version = ">= 3.5"
+#     }
+#   }
+
+#   # Production recommendation:
+#   # Configure a remote backend using S3 and DynamoDB state locking.
+#   # backend "s3" {
+#   #   bucket         = "replace-with-terraform-state-bucket"
+#   #   key            = "secure-vpc/terraform.tfstate"
+#   #   region         = "eu-west-2"
+#   #   dynamodb_table = "replace-with-lock-table"
+#   #   encrypt        = true
+#   # }
+# }
+
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.9.0, < 2.0.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.0, < 7.0"
-    }
-
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.5"
+      # keep your existing version constraint
     }
   }
-
-  # Production recommendation:
-  # Configure a remote backend using S3 and DynamoDB state locking.
-  # backend "s3" {
-  #   bucket         = "replace-with-terraform-state-bucket"
-  #   key            = "secure-vpc/terraform.tfstate"
-  #   region         = "eu-west-2"
-  #   dynamodb_table = "replace-with-lock-table"
-  #   encrypt        = true
-  # }
 }
 
 provider "aws" {
