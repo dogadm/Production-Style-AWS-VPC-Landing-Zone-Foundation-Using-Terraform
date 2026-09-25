@@ -1,183 +1,91 @@
 # Validation Evidence
 
-Use this file to capture proof that the architecture was deployed, validated, and scanned.
+This document records evidence that the Terraform configuration and deployed AWS network foundation implement the intended security architecture. Screenshots are stored in `docs/evidence/vpc/`.
 
-## 1. Terraform Formatting
+## 1. Terraform Formatting and Validation
 
-Command:
+![Terraform formatting and validation results](evidence/vpc/01-terraform-fmt-validate.png)
 
-```bash
-terraform fmt -check
-```
-
-Expected result:
+The screenshot records the results of:
 
 ```text
-No output means formatting passed.
-```
-
-Paste your result here:
-
-```text
-TODO
-```
-
-## 2. Terraform Validation
-
-Command:
-
-```bash
+terraform fmt -check -recursive
+terraform init -backend=false
 terraform validate
 ```
 
-Expected result:
+Terraform formatting and configuration validation passed. The `-backend=false` option does not validate access to the remote state backend.
+
+## 2. Terraform Plan
+
+![Terraform plan summary](evidence/vpc/02-terraform-plan.png
+)
+
+The Terraform plan was reviewed before deployment. It shows the expected VPC, subnet tiers, route tables, gateways, security groups, VPC endpoints and Flow Logs.
+
+## 3. VPC and Subnet Segmentation
+
+![VPC and subnet tiers across Availability Zones](evidence/vpc/03-vpc-subnet-layout.png)
+
+The deployed VPC separates resources into public ingress, private application and isolated data subnets across multiple Availability Zones. Subnet route table associations provide evidence of each tier’s effective routing.
+
+## 4. Route Table Separation
+
+![Subnet route table associations and routes](evidence/vpc/04-route-table-separation.png)
+
+| Subnet tier | Expected routing |
+| --- | --- |
+| Public ingress | `0.0.0.0/0` through an Internet Gateway |
+| Private application | `0.0.0.0/0` through a NAT Gateway |
+| Isolated data | No default internet route |
+
+The route table evidence shows both routes and subnet associations. If IPv6 is enabled, the isolated data tier must also have no `::/0` internet route.
+
+## 5. Security Group Trust Path
+
+![ALB, application and database security group rules](evidence/vpc/05-security-group-paths.png)
+
+The security groups enforce the intended traffic path:
 
 ```text
-Success! The configuration is valid.
+Internet → ALB → Application → Database
 ```
 
-Paste your result here:
+Application ingress references the ALB security group, while database ingress references the application security group on the required ports. The database security group does not use broad internet or VPC-wide ingress rules.
 
-```text
-TODO
-```
+## 6. VPC Endpoints
 
-## 3. Terraform Plan
+![VPC endpoint services and associations](evidence/vpc/06-vpc-endpoints.png)
 
-Command:
+The endpoint evidence shows the selected AWS services, endpoint status and their subnet or route table associations. Gateway endpoints are associated with the route tables required by the architecture.
 
-```bash
-terraform plan
-```
+## 7. VPC Flow Logs
 
-Capture evidence of resources to be created:
+![VPC Flow Logs configuration and delivery](evidence/vpc/07-vpc-flow-logs.png)
 
-```text
-TODO
-```
+VPC Flow Logs are configured to provide network visibility for troubleshooting, security investigations and audit. The evidence shows the log status, traffic type and destination. Recent records at the destination should be included if claiming that log delivery was verified.
 
-## 4. AWS Resource Validation
+## 8. Infrastructure Security Scanning
 
-### VPC
+![TFLint, tfsec and Checkov scan results](evidence/vpc/08-iac-security-scans.png)
 
-```bash
-aws ec2 describe-vpcs --filters "Name=tag:Project,Values=secure-vpc"
-```
+The Terraform configuration was checked using TFLint, tfsec, Checkov and Terraform validation. The scan evidence records the results for the tested revision. Any suppressed or accepted findings should have a documented reason.
 
-Evidence:
+## 9. CI Validation
 
-```text
-TODO
-```
+![GitHub Actions infrastructure validation run](evidence/vpc/09-github-actions-green.png)
 
-### Subnets
+The GitHub Actions run shows formatting, Terraform validation and the configured Infrastructure as Code security checks passing for the relevant commit. If describing these checks as mandatory merge gates, retain evidence of the applicable branch protection rule or repository ruleset.
 
-```bash
-aws ec2 describe-subnets --filters "Name=vpc-id,Values=<vpc-id>"
-```
+## Validation Result
 
-Evidence:
+The collected evidence documents:
 
-```text
-TODO
-```
+- Multi-AZ public, private and isolated subnet segmentation.
+- Controlled internet routing and private application egress.
+- No default internet route for the isolated data tier.
+- Security group boundaries between the ALB, application and database tiers.
+- Private access to selected AWS services through VPC endpoints.
+- VPC network telemetry through Flow Logs.
+- Terraform and Infrastructure as Code checks in CI.
 
-### Route Tables
-
-```bash
-aws ec2 describe-route-tables --filters "Name=vpc-id,Values=<vpc-id>"
-```
-
-Evidence:
-
-```text
-TODO
-```
-
-### Security Groups
-
-```bash
-aws ec2 describe-security-groups --filters "Name=vpc-id,Values=<vpc-id>"
-```
-
-Evidence:
-
-```text
-TODO
-```
-
-### VPC Endpoints
-
-```bash
-aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<vpc-id>"
-```
-
-Evidence:
-
-```text
-TODO
-```
-
-### VPC Flow Logs
-
-```bash
-aws ec2 describe-flow-logs --filter "Name=resource-id,Values=<vpc-id>"
-```
-
-Evidence:
-
-```text
-TODO
-```
-
-## 5. IaC Security Scanning
-
-### TFLint
-
-```bash
-tflint --init
-tflint
-```
-
-Evidence:
-
-```text
-TODO
-```
-
-### tfsec
-
-```bash
-tfsec .
-```
-
-Evidence:
-
-```text
-TODO
-```
-
-### Checkov
-
-```bash
-checkov -d .
-```
-
-Evidence:
-
-```text
-TODO
-```
-
-## 6. Screenshots to Add
-
-Add screenshots showing:
-
-- VPC overview
-- Subnet list showing public, private, and data tiers
-- Route tables showing no default route in data tier
-- Security Groups showing SG-to-SG references
-- VPC Flow Logs enabled
-- VPC Endpoints created
-- Terraform plan or apply output
-- CI pipeline passing checks
